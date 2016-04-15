@@ -7,9 +7,10 @@ import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarCookie;
 import net.lightbody.bmp.core.har.HarEntry;
-import net.lightbody.bmp.core.har.HarNameValuePair;
+import net.lightbody.bmp.core.har.HarHeader;
 import net.lightbody.bmp.core.har.HarPostData;
 import net.lightbody.bmp.core.har.HarPostDataParam;
+import net.lightbody.bmp.core.har.HarQueryParam;
 import net.lightbody.bmp.core.har.HarRequest;
 import net.lightbody.bmp.core.har.HarResponse;
 import net.lightbody.bmp.proxy.BlacklistEntry;
@@ -21,6 +22,7 @@ import net.lightbody.bmp.proxy.jetty.util.UrlEncoded;
 import net.lightbody.bmp.proxy.util.CappedByteArrayOutputStream;
 import net.lightbody.bmp.proxy.util.ClonedOutputStream;
 import net.lightbody.bmp.proxy.util.IOUtils;
+
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpClientConnection;
@@ -118,6 +120,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
+
 
 /**
  * WARN : Require zlib > 1.1.4 (deflate support)
@@ -720,7 +723,7 @@ public class BrowserMobHttpClient {
 	        UrlEncoded.decodeTo(query, params, "UTF-8");
 	        for (Object k : params.keySet()) {
 	        	for (Object v : params.getValues(k)) {
-	        		entry.getRequest().getQueryString().add(new HarNameValuePair((String) k, (String) v));
+	        		entry.getRequest().getQueryString().add(new HarQueryParam((String) k, (String) v));
 	        	}
 	        }
         }
@@ -894,12 +897,12 @@ public class BrowserMobHttpClient {
                     urlEncoded = true;
                 }
 
-                entry.getRequest().getHeaders().add(new HarNameValuePair(header.getName(), header.getValue()));
+                entry.getRequest().getHeaders().add(new HarHeader(header.getName(), header.getValue()));
             }
 
             if (response != null) {
                 for (Header header : response.getAllHeaders()) {
-                    entry.getResponse().getHeaders().add(new HarNameValuePair(header.getName(), header.getValue()));
+                    entry.getResponse().getHeaders().add(new HarHeader(header.getName(), header.getValue()));
                 }
             }
         }
